@@ -71,23 +71,21 @@ class Transaction:
 # this method is based on the pdfminer.six documentation referenced above, written myself
 def extractRawText(filepath):
     output = StringIO()
-    origFile = open(filepath, "rb")
-
-    # the following lines are pretty much verbatim from the documentation.  Sets up the pdfminer
-    # and processes the document.
-    parser = PDFParser(origFile)
-    doc = PDFDocument(parser)
-    rsrcmgr = PDFResourceManager()
-    device = TextConverter(rsrcmgr, output, laparams=LAParams())
-    interpreter = PDFPageInterpreter(rsrcmgr, device)
-    for page in PDFPage.create_pages(doc):
-        interpreter.process_page(page)
+    with open(filepath, "rb") as origFile:
+        # the following lines are pretty much verbatim from the documentation.  Sets up the pdfminer
+        # and processes the document.
+        parser = PDFParser(origFile)
+        doc = PDFDocument(parser)
+        rsrcmgr = PDFResourceManager()
+        device = TextConverter(rsrcmgr, output, laparams=LAParams())
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        for page in PDFPage.create_pages(doc):
+            interpreter.process_page(page)
 
     # save text before closing IO string
-    outputAsText = output.getvalue()
+        outputAsText = output.getvalue()
 
-    # close up everything
-    origFile.close()
+    # close IO stream
     output.close()
 
     # return the text
@@ -174,6 +172,7 @@ for tx in txList:
 
 # create empty csv file and file creator
 # create the new file
+#TODO: change this (or these) to a "with" statement
 csvFile = open(csvFilename, "x")
 csvFile.close()
 #TODO: I want to write to the file, but still throw an error if the file already exists.  Opening it twice is a workaround.
